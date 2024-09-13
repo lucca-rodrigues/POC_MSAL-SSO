@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@contexts/auth/useAuthContext';
 import { useGlobalContext } from '@contexts/globalContext/useGlobalContext';
 import { RootTemplate } from '@components';
@@ -9,30 +9,15 @@ import NotFound from '@root/pages/not-found';
 import { useMsal } from '@azure/msal-react';
 
 export default function AppRoutes() {
-  const navigate = useNavigate();
-  const { isAuthenticated, isLoading, setIsAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading, setIsLoading } = useAuth();
   const { theme } = useGlobalContext();
-  const location = useLocation();
   const { instance } = useMsal();
 
   useEffect(() => {
-    if (isAuthenticated && location.pathname === '/') {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate, location.pathname]);
+    setIsLoading(false);
+  }, [isAuthenticated, setIsLoading]);
 
-  useEffect(() => {
-    const checkAccount = async () => {
-      const response = await instance.handleRedirectPromise();
-      if (response && response.account) {
-        setIsAuthenticated(true);
-        navigate('/dashboard');
-      }
-    };
-    checkAccount();
-  }, [instance, navigate]);
-
-  if (isAuthenticated && isLoading) {
+  if (isLoading) {
     return (
       <Box
         height="100%"
@@ -65,12 +50,14 @@ export default function AppRoutes() {
             key={path}
             path={path}
             element={
-              isPublicRoute || isAuthenticated ? (
-                isPublicRoute && !isAuthenticated ? (
-                  element
+              isAuthenticated ? (
+                isPublicRoute ? (
+                  <Navigate to="/dashboard" replace />
                 ) : (
                   <RootTemplate>{element}</RootTemplate>
                 )
+              ) : isPublicRoute ? (
+                element
               ) : (
                 <Navigate to="/" replace />
               )

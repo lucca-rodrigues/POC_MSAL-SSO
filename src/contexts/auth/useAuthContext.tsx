@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-refresh/only-export-components */
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import Cookies from 'js-cookie';
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 
 interface IAuthContext {
-  token: string;
+  token: boolean;
   isAuthenticated: boolean;
   setIsAuthenticated: (value: boolean) => void;
   signOut: () => void;
@@ -15,7 +14,7 @@ interface IAuthContext {
   setIsLoading: (value: boolean) => void;
   handleGlobalLoader: () => void;
   handleGlobalLoaderNavigation: () => void;
-  setUserToken: (token: string) => void;
+  // setUserToken: (token: string) => void;
 }
 
 interface IAuthProviderProps {
@@ -23,7 +22,7 @@ interface IAuthProviderProps {
 }
 
 const AuthContext = createContext<IAuthContext>({
-  token: '',
+  token: false,
   isAuthenticated: false,
   setIsAuthenticated: () => {},
   signOut: () => {},
@@ -31,31 +30,25 @@ const AuthContext = createContext<IAuthContext>({
   setIsLoading: () => {},
   handleGlobalLoader: () => {},
   handleGlobalLoaderNavigation: () => {},
-  setUserToken: () => {},
+  // setUserToken: () => {},
 });
 
 export const AuthProvider = ({ children }: IAuthProviderProps) => {
   const navigate = useNavigate();
-  const [token, setToken] = useState(Cookies.get('token') ?? '');
+  const [token, setToken] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const { instance } = useMsal();
 
-  function setUserToken(token) {
-    if (token) {
-      Cookies.set('token', token);
-      setToken(token);
-      setIsAuthenticated(true);
-      instance.setActiveAccount(instance.getAllAccounts()[0]); // Adicionado para definir a conta ativa no MSAL
-    }
-  }
+  const storageToken = window.localStorage.getItem('msal.account.keys');
 
-  useEffect(() => {
-    if (token) {
+  useMemo(() => {
+    if (storageToken) {
       setIsAuthenticated(true);
+      setToken(true);
     }
-  }, [token]);
+  }, [storageToken]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -79,20 +72,14 @@ export const AuthProvider = ({ children }: IAuthProviderProps) => {
 
   const signOut = () => {
     handleGlobalLoader();
-    Cookies.remove('token');
-    instance.logoutRedirect(); // Adicionado para fazer logout no MSAL
+    localStorage.clear();
+    instance.logoutRedirect();
     setTimeout(() => {
       setIsAuthenticated(false);
       setIsLoading(false);
       navigate('/');
     }, 1000);
   };
-
-  //  useEffect(() => {
-  //    if (user && token) {
-  //      setIsAuthenticated(true);
-  //    }
-  //  }, [user, token]);
 
   useEffect(() => {
     if (token) {
@@ -111,7 +98,7 @@ export const AuthProvider = ({ children }: IAuthProviderProps) => {
         setIsLoading,
         handleGlobalLoader,
         handleGlobalLoaderNavigation,
-        setUserToken,
+        // setUserToken,
       }}
     >
       {children}

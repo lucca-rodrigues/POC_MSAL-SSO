@@ -25,23 +25,21 @@ function App() {
     const activeAccount = msalInstance.getActiveAccount();
 
     if (!activeAccount) {
-      // Account selection
       const accounts = msalInstance.getAllAccounts();
       if (accounts.length > 0) {
         msalInstance.setActiveAccount(accounts[0]);
       }
     }
 
-    //set the account
     msalInstance.addEventCallback((event: EventMessage) => {
       if (event.eventType === EventType.LOGIN_SUCCESS && event.payload) {
         const authenticationResult = event.payload as AuthenticationResult;
         const account = authenticationResult.account;
         msalInstance.setActiveAccount(account);
+        window.location.href = '/dashboard';
       }
     });
 
-    //enable account storage event
     msalInstance.enableAccountStorageEvents();
   }, [msalInstance]);
 

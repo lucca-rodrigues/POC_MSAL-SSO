@@ -2,18 +2,17 @@ import { ReactNode, useState } from 'react';
 import { useAuth } from '@root/contexts/auth/useAuthContext';
 
 import { Navigate } from 'react-router-dom';
-// import { useGlobalContext } from '@root/contexts/globalContext/useGlobalContext';
+import { useGlobalContext } from '@root/contexts/globalContext/useGlobalContext';
 import { Box, Grid2 as Grid, Hidden } from '@mui/material';
 import { SidebarMenu } from '../SidebarMenu';
-import bgImage from '@assets/bg_man.jpg';
+import { Header } from '../Header';
 
 type RootTemplateProps = {
   children: ReactNode;
 };
 
 export function RootTemplate({ children }: RootTemplateProps) {
-  // const { theme } = useGlobalContext();
-
+  const { theme } = useGlobalContext();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { isLoading, isAuthenticated, signOut } = useAuth();
 
@@ -33,10 +32,9 @@ export function RootTemplate({ children }: RootTemplateProps) {
               md: 2,
             }}
             sx={{
-              borderRadius: '0 20px 20px 0',
               backgroundSize: 'inherit',
               backgroundPosition: 'left center',
-              backgroundImage: `url(${bgImage})`,
+              background: theme?.defaultColor,
             }}
           >
             <SidebarMenu />
@@ -48,6 +46,7 @@ export function RootTemplate({ children }: RootTemplateProps) {
             md: 10,
           }}
         >
+          <Header theme={theme} signOut={signOut} />
           <Box
             pb={4}
             pl={4}

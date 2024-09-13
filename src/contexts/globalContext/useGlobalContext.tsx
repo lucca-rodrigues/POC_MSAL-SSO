@@ -10,6 +10,7 @@ interface IGlobalProviderProps {
 export interface ITheme {
   defaultColor: string;
   secondaryColor: string;
+  primaryColor: string;
 }
 
 interface IGlobalContext {
@@ -22,6 +23,7 @@ const GlobalContext = createContext<IGlobalContext>({
   theme: {
     defaultColor: '',
     secondaryColor: '',
+    primaryColor: '',
   },
   lightenColor: () => '',
   darkenColor: () => '',
@@ -29,8 +31,9 @@ const GlobalContext = createContext<IGlobalContext>({
 
 export const GlobalProvider = ({ children }: IGlobalProviderProps) => {
   const [theme, setTheme] = useState<ITheme>({
-    defaultColor: '#3686F8',
-    secondaryColor: '#F18932',
+    defaultColor: '#282e32',
+    primaryColor: '#3b4248',
+    secondaryColor: '#3686F8',
   });
 
   const lightenColor = (color: string, factorValue: number) => lighten(factorValue, color);

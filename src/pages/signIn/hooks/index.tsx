@@ -10,7 +10,7 @@ import { loginRequest } from '../../../authConfig';
 
 export default function useSignIn() {
   const service = new SignInServices();
-  const { setUserToken } = useAuth();
+  // const { setUserToken } = useAuth();
   const { theme } = useGlobalContext();
 
   const navigate = useNavigate();
@@ -28,8 +28,7 @@ export default function useSignIn() {
     };
 
     if (formatedData?.email && formatedData?.password) {
-      setUserToken('123456');
-      await instance.loginRedirect(loginRequest); // Adicionado para iniciar o login com MSAL
+      await instance.loginRedirect(loginRequest);
     } else {
       toast.error('Usuário ou senha inválidos');
     }
