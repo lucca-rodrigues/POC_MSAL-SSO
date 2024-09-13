@@ -21,17 +21,8 @@ export default function useSignIn() {
 
   const { instance } = useMsal();
 
-  async function signIn(data) {
-    const formatedData = {
-      email: data.email,
-      password: data.password,
-    };
-
-    if (formatedData?.email && formatedData?.password) {
-      await instance.loginRedirect(loginRequest);
-    } else {
-      toast.error('Usuário ou senha inválidos');
-    }
+  async function signIn() {
+    await instance.loginRedirect(loginRequest);
   }
 
   function validateIfIsDisabledButton() {
